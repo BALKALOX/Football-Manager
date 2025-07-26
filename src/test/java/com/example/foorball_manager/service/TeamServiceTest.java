@@ -4,6 +4,7 @@ import com.example.foorball_manager.dto.TeamDto;
 import com.example.foorball_manager.entity.Team;
 import com.example.foorball_manager.mapper.TeamMapper;
 import com.example.foorball_manager.repository.TeamRepository;
+import com.example.foorball_manager.repository.TransferRepository;
 import com.example.foorball_manager.service.impl.TeamServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,9 @@ class TeamServiceTest {
 
     @Mock
     private TeamMapper teamMapper;
+
+    @Mock
+    private TransferRepository transferRepository;
 
     @InjectMocks
     private TeamServiceImpl teamService;
@@ -110,7 +115,7 @@ class TeamServiceTest {
 
     @Test
     void testUpdateTeam_TeamExists() {
-        when(teamRepository.existsById(1L)).thenReturn(true);
+        when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
         when(teamRepository.save(any(Team.class))).thenReturn(team);
         when(teamMapper.toDto(team)).thenReturn(teamDto);
 
@@ -118,37 +123,49 @@ class TeamServiceTest {
 
         assertNotNull(result);
         assertEquals("Barcelona", result.getName());
-        verify(teamRepository).existsById(1L);
         verify(teamRepository).save(any(Team.class));
         verify(teamMapper).toDto(team);
     }
-
     @Test
     void testUpdateTeam_TeamNotFound() {
-        when(teamRepository.existsById(1L)).thenReturn(false);
+        when(teamRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> teamService.updateTeam(1L, teamDto));
-        verify(teamRepository).existsById(1L);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> teamService.updateTeam(1L, teamDto));
+
+        assertEquals("Team with id:1 is not found", exception.getMessage());
+
+        verify(teamRepository).findById(1L);
         verify(teamRepository, never()).save(any());
         verify(teamMapper, never()).toDto(any());
     }
 
     @Test
     void testDeleteTeam_TeamExists() {
-        when(teamRepository.existsById(1L)).thenReturn(true);
+        Team team = new Team();
+        team.setId(1L);
+        team.setPlayers(new ArrayList<>());
+
+        when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
+        when(transferRepository.findAllByFromTeam(team)).thenReturn(new ArrayList<>());
+        when(transferRepository.findAllByToTeam(team)).thenReturn(new ArrayList<>());
 
         teamService.deleteTeam(1L);
 
-        verify(teamRepository).existsById(1L);
-        verify(teamRepository).deleteById(1L);
+        verify(teamRepository).findById(1L);
+        verify(teamRepository).delete(team);
     }
 
     @Test
     void testDeleteTeam_TeamNotFound() {
-        when(teamRepository.existsById(1L)).thenReturn(false);
+        when(teamRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> teamService.deleteTeam(1L));
-        verify(teamRepository).existsById(1L);
-        verify(teamRepository, never()).deleteById(any());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> teamService.deleteTeam(1L));
+
+        assertEquals("Team with id:1 is not found", exception.getMessage());
+
+        verify(teamRepository).findById(1L);
+        verify(teamRepository, never()).delete(any());
     }
 }

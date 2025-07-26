@@ -14,7 +14,9 @@ public class PlayerMapper {
         playerDto.setFullName(player.getFullName());
         playerDto.setAge(player.getAge());
         playerDto.setExperienceMonth(player.getExperienceMonth());
-        playerDto.setTeamId(player.getTeam().getId());
+        if (player.getTeam()!=null){
+            playerDto.setTeamId(player.getTeam().getId());
+        }
 
         return playerDto;
     }

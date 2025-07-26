@@ -1,12 +1,17 @@
 package com.example.foorball_manager.service.impl;
 
 import com.example.foorball_manager.dto.TeamDto;
+import com.example.foorball_manager.entity.Player;
 import com.example.foorball_manager.entity.Team;
+import com.example.foorball_manager.entity.Transfer;
 import com.example.foorball_manager.mapper.TeamMapper;
+import com.example.foorball_manager.repository.PlayerRepository;
 import com.example.foorball_manager.repository.TeamRepository;
+import com.example.foorball_manager.repository.TransferRepository;
 import com.example.foorball_manager.service.TeamService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +22,8 @@ public class TeamServiceImpl implements TeamService {
 
     private TeamRepository teamRepository;
     private TeamMapper teamMapper;
+    private TransferRepository transferRepository;
+    private PlayerRepository playerRepository;
 
     @Override
     public List<TeamDto> findAll() {
@@ -56,11 +63,30 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public void deleteTeam(Long id) {
-        var exists = teamRepository.existsById(id);
-        if (!exists){
-            throw new IllegalArgumentException("Team with id:" + id +" is not found");
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Team with id:" + id + " is not found"));
+
+        for (Player player : team.getPlayers()) {
+            player.setTeam(null);
+            playerRepository.save(player);
         }
-        teamRepository.deleteById(id);
+
+        List<Transfer> fromTransfers = transferRepository.findAllByFromTeam(team);
+        for (Transfer transfer : fromTransfers) {
+            System.out.println("FromTransfer id=" + transfer.getId() + ", player id=" +
+                    (transfer.getPlayer() != null ? transfer.getPlayer().getId() : "null"));
+        }
+
+        List<Transfer> toTransfers = transferRepository.findAllByToTeam(team);
+        for (Transfer transfer : toTransfers) {
+            System.out.println("ToTransfer id=" + transfer.getId() + ", player id=" +
+                    (transfer.getPlayer() != null ? transfer.getPlayer().getId() : "null"));
+        }
+
+        transferRepository.saveAll(fromTransfers);
+        transferRepository.saveAll(toTransfers);
+
+        teamRepository.delete(team);
     }
 
 }

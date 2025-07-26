@@ -26,11 +26,11 @@ public class Transfer {
     private Player player;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_team_id", nullable = false)
+    @JoinColumn(name = "from_team_id", nullable = true)
     private Team fromTeam;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_team_id", nullable = false)
+    @JoinColumn(name = "to_team_id", nullable = true)
     private Team toTeam;
 
     @Column(nullable = false)
