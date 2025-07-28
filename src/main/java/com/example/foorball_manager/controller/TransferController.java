@@ -5,6 +5,7 @@ import com.example.foorball_manager.dto.TransferResponseDto;
 import com.example.foorball_manager.entity.Transfer;
 import com.example.foorball_manager.service.TransferService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class TransferController {
 
     @PostMapping
     public ResponseEntity<TransferResponseDto> createTransfer(@RequestBody TransferDto transferDto) {
-        return ResponseEntity.ok(transferService.createTransfer(transferDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(transferService.createTransfer(transferDto));
     }
 
 }

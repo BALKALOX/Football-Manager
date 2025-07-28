@@ -3,7 +3,9 @@ package com.example.foorball_manager.controller;
 import com.example.foorball_manager.dto.TeamDto;
 import com.example.foorball_manager.entity.Team;
 import com.example.foorball_manager.service.TeamService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,21 +35,21 @@ public class TeamController {
     }
 
     @PostMapping
-    public ResponseEntity<TeamDto> createTeam(@RequestBody TeamDto teamDto) {
+    public ResponseEntity<TeamDto> createTeam(@Valid @RequestBody TeamDto teamDto) {
         var team = teamService.createTeam(teamDto);
-        return ResponseEntity.ok(team);
+        return ResponseEntity.status(HttpStatus.CREATED).body(team);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TeamDto> updateTeam(@PathVariable Long id,
-                                           @RequestBody TeamDto teamDto) {
+                                              @Valid @RequestBody TeamDto teamDto) {
         var team = teamService.updateTeam(id, teamDto);
-        return ResponseEntity.ok(team);
+        return ResponseEntity.status(HttpStatus.OK).body(team);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

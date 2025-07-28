@@ -3,6 +3,7 @@ package com.example.foorball_manager.service;
 import com.example.foorball_manager.dto.PlayerDto;
 import com.example.foorball_manager.entity.Player;
 import com.example.foorball_manager.entity.Team;
+import com.example.foorball_manager.exeption.ResourceNotFoundException;
 import com.example.foorball_manager.mapper.PlayerMapper;
 import com.example.foorball_manager.mapper.TeamMapper;
 import com.example.foorball_manager.repository.PlayerRepository;
@@ -66,7 +67,7 @@ public class PlayerServiceTest {
     void testFindById_PlayerDoesNotExist() {
         when(playerRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> playerService.findById(1L));
+        assertThrows(ResourceNotFoundException.class, () -> playerService.findById(1L));
 
         verify(playerRepository, never()).findById(1L);
     }
@@ -115,7 +116,7 @@ public class PlayerServiceTest {
         when(playerMapper.toEntity(playerDto)).thenReturn(player);
         when(teamRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> playerService.createPlayer(playerDto));
 
         verify(teamRepository).findById(99L);
@@ -184,7 +185,7 @@ public class PlayerServiceTest {
 
         when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> playerService.updatePlayer(playerId, updateDto));
 
         assertEquals("Player with id:99 is not found", exception.getMessage());
@@ -260,7 +261,7 @@ public class PlayerServiceTest {
 
         when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> playerService.deletePlayer(playerId));
 
         assertEquals("player with id:99 is not found", exception.getMessage());

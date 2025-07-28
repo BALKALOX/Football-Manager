@@ -3,6 +3,7 @@ package com.example.foorball_manager.service.impl;
 import com.example.foorball_manager.dto.PlayerDto;
 import com.example.foorball_manager.entity.Player;
 import com.example.foorball_manager.entity.Team;
+import com.example.foorball_manager.exeption.ResourceNotFoundException;
 import com.example.foorball_manager.mapper.PlayerMapper;
 import com.example.foorball_manager.repository.PlayerRepository;
 import com.example.foorball_manager.repository.TeamRepository;
@@ -38,7 +39,7 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerDto findById(Long id) {
         var exists = playerRepository.existsById(id);
         if (!exists) {
-            throw new IllegalArgumentException("player with id:"+id+" is not found");
+            throw new ResourceNotFoundException("player with id:"+id+" is not found");
         }
         var player = playerRepository.findById(id).get();
 
@@ -47,16 +48,26 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public PlayerDto createPlayer(PlayerDto playerDto) {
-        var player = playerMapper.toEntity(playerDto);
-        player.setTeam(teamRepository.findById(playerDto.getTeamId()).get());
-        player = playerRepository.save(player);
-        return playerMapper.toDto(player);
+        Player player = playerMapper.toEntity(playerDto);
+
+        if (playerDto.getTeamId() != null) {
+            Team team = teamRepository.findById(playerDto.getTeamId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Team with id:" + playerDto.getTeamId() + " is not found"));
+
+            player.setTeam(team);
+        } else {
+            player.setTeam(null);
+        }
+
+        return playerMapper.toDto(playerRepository.save(player));
     }
+
 
     @Override
     public PlayerDto updatePlayer(Long id, PlayerDto playerDto) {
         Player existingPlayer = playerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Player with id:" + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Player with id:" + id + " is not found"));
 
         existingPlayer.setFullName(playerDto.getFullName());
         existingPlayer.setExperienceMonth(playerDto.getExperienceMonth());
@@ -64,7 +75,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         if (playerDto.getTeamId() != null) {
             Team newTeam = teamRepository.findById(playerDto.getTeamId())
-                    .orElseThrow(() -> new IllegalArgumentException("Team with id:" + playerDto.getTeamId() + " is not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Team with id:" + playerDto.getTeamId() + " is not found"));
 
             existingPlayer.setTeam(newTeam);
         } else {
@@ -78,7 +89,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Transactional
     public void deletePlayer(Long id) {
         Player player = playerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("player with id:" + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("player with id:" + id + " is not found"));
 
         transferRepository.deleteAllByPlayer(player);
 

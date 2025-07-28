@@ -2,6 +2,7 @@ package com.example.foorball_manager.service;
 
 import com.example.foorball_manager.dto.TeamDto;
 import com.example.foorball_manager.entity.Team;
+import com.example.foorball_manager.exeption.ResourceNotFoundException;
 import com.example.foorball_manager.mapper.TeamMapper;
 import com.example.foorball_manager.repository.TeamRepository;
 import com.example.foorball_manager.repository.TransferRepository;
@@ -130,7 +131,7 @@ class TeamServiceTest {
     void testUpdateTeam_TeamNotFound() {
         when(teamRepository.findById(1L)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> teamService.updateTeam(1L, teamDto));
 
         assertEquals("Team with id:1 is not found", exception.getMessage());
@@ -160,7 +161,7 @@ class TeamServiceTest {
     void testDeleteTeam_TeamNotFound() {
         when(teamRepository.findById(1L)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> teamService.deleteTeam(1L));
 
         assertEquals("Team with id:1 is not found", exception.getMessage());

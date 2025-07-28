@@ -83,7 +83,7 @@ class TransferControllerTest {
         mockMvc.perform(post("/api/v1/transfers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.transferPrice").value(500000.0))
                 .andExpect(jsonPath("$.commission").value(0.1))

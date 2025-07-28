@@ -79,7 +79,7 @@ class TeamControllerTest {
         mockMvc.perform(post("/api/v1/teams")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Barcelona"))
                 .andExpect(jsonPath("$.balance").value(1000000.0))
                 .andExpect(jsonPath("$.commission").value(0.1));
@@ -111,6 +111,6 @@ class TeamControllerTest {
     @Test
     void deleteTeam_shouldReturnOk() throws Exception {
         mockMvc.perform(delete("/api/v1/teams/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 }

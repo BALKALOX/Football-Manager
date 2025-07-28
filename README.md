@@ -1,85 +1,87 @@
-Football Manager
-A web application for managing football teams, players, and transfers.
-It allows you to create teams, add and update players, manage transfers between clubs, and track financial balances.
+# Football Manager
 
-Features
-CRUD operations for Teams and Players
+## Overview
 
-Manage Transfers between clubs
+Football Manager is a REST API service for managing football teams, players, and transfers.  
+The project is built with Spring Boot and uses MySQL as the database, all running inside Docker containers.
 
-Automatic update of balances and commissions
+---
 
-Validation and error handling (e.g., missing team or player)
+## Technologies
 
-REST API for integration with front-end or external services
+- Java 17
+- Spring Boot 3.x (Web, Data JPA, Validation)
+- Hibernate ORM
+- MySQL 8
+- Docker, Docker Compose
+- Lombok
+- MapStruct (for DTO mapping)
+- Postman (for API testing)
 
-Tech Stack
-Backend: Spring Boot (Java 17)
+---
 
-Database: MySQL (JPA/Hibernate)
+## Features
 
-Testing: JUnit 5, Mockito
+- CRUD operations for players, teams, and transfers
+- Input data validation
+- Error handling
+- Entity relationships (Player ↔ Team, Transfer ↔ Player)
 
-Build Tool: Maven
+---
 
-API: REST with JSON
+## Running the Project
 
-Getting Started
-Prerequisites
-Java 17 or higher
+### Prerequisites:
 
-Maven 3.8+
+- Docker and Docker Compose installed
+- Cloned repository
 
-MySQL
+### Start the application (from the project root):
 
-Installation
+```bash
+docker-compose up --build
+This will build the images and start containers for MySQL and the application.
+
+Verify:
+The application will be available at: http://localhost:8080
+
+MySQL listens on port 3306 (make sure this port is free)
+
+Configuration
+docker-compose.yml defines two services: app (Java application) and mysql (database)
+
+Database connection settings are configured in application.yml
+
+Application port is 8080, MySQL external port is 3306
+
+API Testing
+Import the Postman collection located at postman/FootballManager.postman_collection.json
+
+The collection contains ready-to-use requests for all API endpoints
+
+Notes
+Lombok is used to reduce boilerplate code (getters/setters, constructors)
+
+MapStruct handles DTO ↔ Entity conversion
+
+To stop the containers, run:
+
 bash
 Копіювати
 Редагувати
-# Clone the repository
-git clone https://github.com/BALKALOX/football-manager
-cd football-manager
+docker-compose down
+Future Plans
+Add authentication and authorization
 
-# Configure database in application.properties
-spring.datasource.url=jdbc:mysql://localhost:3306/football_manager
-spring.datasource.username=YOUR_USERNAME
-spring.datasource.password=YOUR_PASSWORD
+Implement search and filtering features
 
-# Build and run
-mvn spring-boot:run
-API Endpoints
-Teams
-GET /teams – Get all teams
+Extend transfer functionality
 
-GET /teams/{id} – Get team by ID
+Refactor the project applying design patterns
 
-POST /teams – Create new team
+Contact
+Author: Anton Misiura
+Email: anton.misiura@lll.kpi.ua
 
-PUT /teams/{id} – Update team
-
-DELETE /teams/{id} – Delete team
-
-Players
-GET /players – Get all players
-
-GET /players/{id} – Get player by ID
-
-POST /players – Create new player
-
-PUT /players/{id} – Update player
-
-DELETE /players/{id} – Delete player
-
-Transfers
-POST /transfers – Create transfer between teams
-
-Tests
-The project includes unit tests using JUnit 5 and Mockito:
-
-Service layer tests for PlayerService and TeamService
-
-Validation of exception handling and repository calls
-
-License
-This project is licensed under the MIT License.
-
+Thank you for checking out this project!
+Feel free to reach out for any questions or collaboration ideas.

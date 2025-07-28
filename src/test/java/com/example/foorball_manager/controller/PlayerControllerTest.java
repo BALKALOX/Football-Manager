@@ -73,7 +73,7 @@ class PlayerControllerTest {
         mockMvc.perform(post("/api/v1/players")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.fullName").value("Messi"))
                 .andExpect(jsonPath("$.teamId").value(1));
     }
@@ -101,6 +101,6 @@ class PlayerControllerTest {
     @Test
     void deletePlayer_shouldReturnOk() throws Exception {
         mockMvc.perform(delete("/api/v1/players/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 }

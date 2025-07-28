@@ -5,6 +5,8 @@ import com.example.foorball_manager.dto.TransferResponseDto;
 import com.example.foorball_manager.entity.Player;
 import com.example.foorball_manager.entity.Team;
 import com.example.foorball_manager.entity.Transfer;
+import com.example.foorball_manager.exeption.BadRequestException;
+import com.example.foorball_manager.exeption.ResourceNotFoundException;
 import com.example.foorball_manager.mapper.TransferMapper;
 import com.example.foorball_manager.repository.PlayerRepository;
 import com.example.foorball_manager.repository.TeamRepository;
@@ -109,11 +111,11 @@ class TransferServiceTest {
 
     @Test
     void testCreateTransfer_PlayerHasNoTeam_ThrowsException() {
-        player.setTeam(null); // Без команди
+        player.setTeam(null);
         when(playerRepository.findById(10L)).thenReturn(Optional.of(player));
         when(teamRepository.findById(2L)).thenReturn(Optional.of(toTeam));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(BadRequestException.class,
                 () -> transferService.createTransfer(transferDto));
 
         verify(transferRepository, never()).save(any());
@@ -121,11 +123,11 @@ class TransferServiceTest {
 
     @Test
     void testCreateTransfer_TeamAlreadyHasPlayer_ThrowsException() {
-        toTeam.getPlayers().add(player); // Гравець уже в команді
+        toTeam.getPlayers().add(player);
         when(playerRepository.findById(10L)).thenReturn(Optional.of(player));
         when(teamRepository.findById(2L)).thenReturn(Optional.of(toTeam));
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(BadRequestException.class,
                 () -> transferService.createTransfer(transferDto));
 
         verify(transferRepository, never()).save(any());
@@ -150,7 +152,7 @@ class TransferServiceTest {
     void testFindById_NotExists_ThrowsException() {
         when(transferRepository.existsById(100L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> transferService.findById(100L));
+        assertThrows(ResourceNotFoundException.class, () -> transferService.findById(100L));
 
         verify(transferRepository).existsById(100L);
         verify(transferRepository, never()).findById(100L);
@@ -194,7 +196,7 @@ class TransferServiceTest {
     void testDeleteById_NotExists_ThrowsException() {
         when(transferRepository.existsById(100L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> transferService.deleteById(100L));
+        assertThrows(ResourceNotFoundException.class, () -> transferService.deleteById(100L));
 
         verify(transferRepository).existsById(100L);
         verify(transferRepository, never()).deleteById(any());

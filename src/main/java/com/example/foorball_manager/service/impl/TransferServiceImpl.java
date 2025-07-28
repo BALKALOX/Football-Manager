@@ -2,9 +2,9 @@ package com.example.foorball_manager.service.impl;
 
 import com.example.foorball_manager.dto.TransferDto;
 import com.example.foorball_manager.dto.TransferResponseDto;
-import com.example.foorball_manager.entity.Player;
-import com.example.foorball_manager.entity.Team;
 import com.example.foorball_manager.entity.Transfer;
+import com.example.foorball_manager.exeption.BadRequestException;
+import com.example.foorball_manager.exeption.ResourceNotFoundException;
 import com.example.foorball_manager.mapper.TransferMapper;
 import com.example.foorball_manager.repository.PlayerRepository;
 import com.example.foorball_manager.repository.TeamRepository;
@@ -34,10 +34,10 @@ public class TransferServiceImpl implements TransferService {
             throw new IllegalArgumentException();
         }
         if (player.getTeam()==null){
-            throw new IllegalArgumentException("Player has no team");
+            throw new BadRequestException("Player has no team");
         }
         if (team.getPlayers().contains(player)){
-            throw new IllegalArgumentException("Team already has player");
+            throw new BadRequestException("Team already has player");
         }
         Transfer transfer = new Transfer();
         transfer.setPlayer(player);
@@ -55,7 +55,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public TransferResponseDto findById(Long id) {
         if (!transferRepository.existsById(id)) {
-            throw new IllegalArgumentException("Transfer with id " + id + " is not found");
+            throw new ResourceNotFoundException("Transfer with id " + id + " is not found");
         }
         return transferMapper.toDto(transferRepository.findById(id).get());
     }
@@ -73,7 +73,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public void deleteById(Long id) {
         if (!transferRepository.existsById(id)) {
-            throw new IllegalArgumentException("Transfer with id " + id + " is not found");
+            throw new ResourceNotFoundException("Transfer with id " + id + " is not found");
         }
         transferRepository.deleteById(id);
     }

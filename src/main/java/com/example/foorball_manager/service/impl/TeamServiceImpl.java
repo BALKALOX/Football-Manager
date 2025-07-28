@@ -4,6 +4,7 @@ import com.example.foorball_manager.dto.TeamDto;
 import com.example.foorball_manager.entity.Player;
 import com.example.foorball_manager.entity.Team;
 import com.example.foorball_manager.entity.Transfer;
+import com.example.foorball_manager.exeption.ResourceNotFoundException;
 import com.example.foorball_manager.mapper.TeamMapper;
 import com.example.foorball_manager.repository.PlayerRepository;
 import com.example.foorball_manager.repository.TeamRepository;
@@ -52,7 +53,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamDto updateTeam(Long id, TeamDto teamDto) {
         Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Team with id:" + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Team with id:" + id + " is not found"));
 
         team.setName(teamDto.getName());
         team.setBalance(teamDto.getBalance());
@@ -64,7 +65,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void deleteTeam(Long id) {
         Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Team with id:" + id + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Team with id:" + id + " is not found"));
 
         for (Player player : team.getPlayers()) {
             player.setTeam(null);
